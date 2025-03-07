@@ -1,0 +1,111 @@
+{% extends 'shop/basic.html' %}
+
+{% block title %} {{ product.product_name }} - Product View {% endblock %}
+
+{% block css %}
+<style>
+  /* Scoped styles for the product page only */
+  .product-container {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  .product-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  .product-details {
+    padding-left: 30px;
+  }
+  .product-title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  .product-price {
+    font-size: 1.5rem;
+    color: #28a745;
+    margin-bottom: 20px;
+  }
+  .product-description {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 30px;
+  }
+  .btn-custom {
+    padding: 10px 20px;
+    font-size: 1rem;
+    margin-right: 10px;
+  }
+  .btn-buy-now {
+    background-color: #007bff;
+    border: none;
+  }
+  .btn-buy-now:hover {
+    background-color: #0056b3;
+  }
+  .btn-add-to-cart {
+    background-color: #28a745;
+    border: none;
+  }
+  .btn-add-to-cart:hover {
+    background-color: #218838;
+  }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container product-container my-5">
+  <div class="row">
+    <!-- Product Image -->
+    <div class="col-md-6">
+      <img src="/media/{{ product.image }}" class="product-image" alt="{{ product.product_name }}">
+    </div>
+
+    <!-- Product Details -->
+    <div class="col-md-6 product-details">
+      <h1 class="product-title">{{ product.product_name }}</h1>
+      <p class="product-price"><b>Rs. {{ product.price }}</b></p>
+      <p class="product-description">{{ product.description }}</p>
+
+      <!-- Buttons -->
+      <div class="mt-4">
+        <button class="btn btn-custom btn-buy-now">Buy Now</button>
+        <button class="btn btn-custom btn-add-to-cart">Add to Cart</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block js %}
+
+ if(localStorage.getItem('cart') == null){
+var cart = {};
+}
+else
+{
+cart = JSON.parse(localStorage.getItem('cart'));
+document.getElementById('cart').innerHTML = Object.keys(cart).length;
+}
+$('.cart').click(function(){
+var idstr = this.id.toString();
+if (cart[idstr] !=undefined){
+cart[idstr] = cart[idstr] + 1;
+}
+else
+{
+cart[idstr] = 1;
+}
+localStorage.setItem('cart', JSON.stringify(cart));
+document.getElementById('cart').innerHTML = Object.keys(cart).length;
+});
+$('#popcart').popover();
+document.getElementById("popcart").setAttribute('data-content', '<h5> Items in my cart</h5>');
+
+
+{% endblock %}
