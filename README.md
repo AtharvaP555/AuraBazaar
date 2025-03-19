@@ -21,7 +21,7 @@ AuraBazaar is an e-commerce platform built using Django, designed to offer a sea
 ## Installation & Setup
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/yourusername/AuraBazaar.git
+   git clone https://github.com/AtharvaP555/AuraBazaar.git
    cd AuraBazaar
    ```
 
