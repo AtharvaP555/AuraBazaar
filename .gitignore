@@ -13,4 +13,5 @@ env/
 # IDE 
 .idea/ 
 .vscode/ 
-.cache/ 
+.cache/
+staticfiles/ 

@@ -1,28 +1,40 @@
 from django.http import HttpResponse, Http404
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
+from django.db.models import Prefetch
 from .models import Product, Contact, Order, OrderUpdate
 from math import ceil
+from itertools import groupby
 import json
 import re
 
 
-def index(request):
+def _build_allprods(queryset):
+    """
+    Given a Product queryset, group by category and build the
+    (products, slide_range, nSlides) tuples expected by templates.
+    Single database hit regardless of number of categories.
+    """
     allProds = []
-    catprods = Product.objects.values('category', 'id')
-    cats = {item['category'] for item in catprods}
-
-    for cat in cats:
-        prod = Product.objects.filter(category=cat)
+    # Sort in Python — queryset already fetched
+    sorted_prods = sorted(queryset, key=lambda p: p.category)
+    for category, items in groupby(sorted_prods, key=lambda p: p.category):
+        prod = list(items)
         n = len(prod)
         nSlides = n // 4 + ceil((n / 4) - (n // 4))
         allProds.append([prod, range(1, nSlides), nSlides])
+    return allProds
 
-    return render(request, 'shop/index.html', {'allProds': allProds})
+
+def index(request):
+    # Single query — fetch everything at once
+    products = Product.objects.all().order_by('category', 'id')
+    return render(request, 'shop/index.html', {'allProds': _build_allprods(products)})
 
 
 def about(request):
     return render(request, 'shop/about.html')
+
 
 @require_http_methods(["GET", "POST"])
 def contact(request):
@@ -30,10 +42,10 @@ def contact(request):
     errors = {}
 
     if request.method == "POST":
-        name = request.POST.get('name', '').strip()
+        name  = request.POST.get('name', '').strip()
         email = request.POST.get('email', '').strip()
         phone = request.POST.get('phone', '').strip()
-        desc = request.POST.get('desc', '').strip()
+        desc  = request.POST.get('desc', '').strip()
 
         if not name or len(name) > 50:
             errors['name'] = 'Name is required and must be under 50 characters.'
@@ -55,7 +67,7 @@ def contact(request):
 def tracker(request):
     if request.method == "POST":
         orderId = request.POST.get('orderId', '').strip()
-        email = request.POST.get('email', '').strip()
+        email   = request.POST.get('email', '').strip()
 
         if not orderId.isdigit() or not re.match(r'^[^@\s]+@[^@\s]+\.[^@\s]+$', email):
             return HttpResponse('{"status":"error"}', content_type='application/json')
@@ -67,6 +79,7 @@ def tracker(request):
                     OrderUpdate.objects
                     .filter(order_id=orderId)
                     .values('update_desc', 'timestamp')
+                    .order_by('timestamp')
                 )
                 payload = [{'text': u['update_desc'], 'time': u['timestamp']} for u in updates]
                 response = json.dumps(
@@ -88,19 +101,20 @@ def prodView(request, myid):
         raise Http404("Product not found")
     return render(request, 'shop/prodView.html', {'product': product})
 
+
 @require_http_methods(["GET", "POST"])
 def checkout(request):
     if request.method == "POST":
-        errors = {}
-        items = request.POST.get('itemsJson', '').strip()
-        name = request.POST.get('name', '').strip()
-        email = request.POST.get('email', '').strip()
-        address = (request.POST.get('address1', '').strip()
-                   + ' ' + request.POST.get('address2', '').strip()).strip()
-        city = request.POST.get('city', '').strip()
-        state = request.POST.get('state', '').strip()
+        errors   = {}
+        items    = request.POST.get('itemsJson', '').strip()
+        name     = request.POST.get('name', '').strip()
+        email    = request.POST.get('email', '').strip()
+        address  = (request.POST.get('address1', '').strip()
+                    + ' ' + request.POST.get('address2', '').strip()).strip()
+        city     = request.POST.get('city', '').strip()
+        state    = request.POST.get('state', '').strip()
         zip_code = request.POST.get('zip', '').strip()
-        phone = request.POST.get('phone', '').strip()
+        phone    = request.POST.get('phone', '').strip()
 
         if not name:
             errors['name'] = 'Name is required.'
@@ -132,7 +146,7 @@ def checkout(request):
     return render(request, 'shop/checkout.html')
 
 
-def searchMatch(query, item):
+def _search_match(query, item):
     q = query.lower()
     return (
         q in item.product_name.lower() or
@@ -147,19 +161,16 @@ def search(request):
     allProds = []
 
     if len(query) >= 4:
-        catprods = Product.objects.values('category', 'id')
-        cats = {item['category'] for item in catprods}
-
-        for cat in cats:
-            prodtemp = Product.objects.filter(category=cat)
-            prod = [item for item in prodtemp if searchMatch(query, item)]
-            if prod:
-                n = len(prod)
-                nSlides = n // 4 + ceil((n / 4) - (n // 4))
-                allProds.append([prod, range(1, nSlides), nSlides])
+        # Single query, filter in Python to avoid per-field LIKE queries
+        products = Product.objects.all().order_by('category', 'id')
+        matched  = [p for p in products if _search_match(query, p)]
+        allProds = _build_allprods(matched)
 
     if not allProds:
-        params = {'allProds': [], 'msg': 'Please enter a more specific search query (min 4 characters).'}
+        params = {
+            'allProds': [],
+            'msg': 'No results found. Try a different search term (min 4 characters).'
+        }
     else:
         params = {'allProds': allProds, 'msg': ''}
 
