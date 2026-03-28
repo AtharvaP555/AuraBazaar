@@ -1,119 +1,153 @@
-{% extends 'shop/basic.html' %}
-
-{% block title %} AuraBazaar Order Tracker {% endblock %}
-
-{% block body %}
-
-<div class="container">
-    <div class="col my-4">
-        <h2>Enter your Order ID and Email Address to track your order</h2>
-        <form method="post" action="#" id="trackerForm">{% csrf_token %}
-            <div class="form-row">
-                <div class="form-group col-md-6">
-                    <label for="orderId">Order Id</label>
-                    <input type="text" class="form-control" id="orderId" name="orderId" placeholder="Order Id">
-                </div>
-                <div class="form-group col-md-6">
-                    <label for="email">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" placeholder="Email">
-                </div>
-                <button type="submit" class="btn btn-primary">Track Order</button>
-            </div>
-          </form>
-    </div>
-
-    <div class="col my-4">
-        <h2>Your Order Status</h2>
-        <div class="my-4">
-            <ul class="list-group" id="items">
-            	Enter your order ID and Email Address and click Track Order to find details about your order!
-            </ul>
-        </div>
-        <h2>Your Order Details</h2>
-        <div class="my-4">
-            <ul class="list-group" id="citems">
-            </ul>
-        </div>
-    </div>
+{% extends 'shop/base.html' %} {% block title %}Order Tracker — AuraBazaar
+{%endblock %} {% block content %}
+<div class="page-hero">
+  <div class="container">
+    <h1>Track Your Order</h1>
+    <p>Enter your order ID and email to see live status updates.</p>
+  </div>
 </div>
 
+<div
+  class="container"
+  style="padding-top: 3rem; padding-bottom: 3rem; max-width: 680px"
+>
+  <div class="form-card" style="margin-bottom: 1.5rem">
+    <form id="tracker-form">
+      {% csrf_token %}
+      <div
+        style="
+          display: grid;
+          grid-template-columns: 1fr 1fr auto;
+          gap: 1rem;
+          align-items: end;
+        "
+      >
+        <div class="form-group" style="margin-bottom: 0">
+          <label class="form-label">Order ID</label>
+          <input
+            type="text"
+            id="orderId"
+            class="form-control"
+            placeholder="e.g. 1042"
+          />
+        </div>
+        <div class="form-group" style="margin-bottom: 0">
+          <label class="form-label">Email</label>
+          <input
+            type="email"
+            id="email"
+            class="form-control"
+            placeholder="you@example.com"
+          />
+        </div>
+        <button type="submit" class="btn btn-primary">Track</button>
+      </div>
+    </form>
+  </div>
 
-{% endblock %}
+  <div id="tracker-results" style="display: none">
+    <div class="form-card" style="margin-bottom: 1rem">
+      <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 1rem">
+        Order Status
+      </h3>
+      <div id="status-list"></div>
+    </div>
+    <div class="form-card">
+      <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 1rem">
+        Items Ordered
+      </h3>
+      <div id="items-list"></div>
+    </div>
+  </div>
 
-{% block js %}
+  <div id="tracker-empty" style="display: none">
+    <div class="empty-state">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+      >
+        <circle cx="11" cy="11" r="8" />
+        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+      </svg>
+      <p>No order found. Check your order ID and email.</p>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  document
+    .getElementById("tracker-form")
+    .addEventListener("submit", function (e) {
+      e.preventDefault();
+      var orderId = document.getElementById("orderId").value.trim();
+      var email = document.getElementById("email").value.trim();
+      var csrf = document.querySelector("[name=csrfmiddlewaretoken]").value;
 
- if(localStorage.getItem('cart') == null){
-var cart = {};
-}
-else
-{
-cart = JSON.parse(localStorage.getItem('cart'));
-document.getElementById('cart').innerHTML = Object.keys(cart).length;
-}
-$('.cart').click(function(){
-var idstr = this.id.toString();
-if (cart[idstr] !=undefined){
-cart[idstr] = cart[idstr] + 1;
-}
-else
-{
-cart[idstr] = 1;
-}
-localStorage.setItem('cart', JSON.stringify(cart));
-document.getElementById('cart').innerHTML = Object.keys(cart).length;
-});
-$('#popcart').popover();
-document.getElementById("popcart").setAttribute('data-content', '<h5> Items in my cart</h5>');
+      document.getElementById("tracker-results").style.display = "none";
+      document.getElementById("tracker-empty").style.display = "none";
 
-$('#trackerForm').submit(function(event) {
-    $('#items').empty();
-    var formData = {
-        'orderId': $('input[name=orderId]').val(),
-        'email': $('input[name=email]').val(),
-        'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
-    };
-    $.ajax({
-            type: 'POST',
-            url: '/shop/tracker/',
-            data: formData,
-            encode: true
+      fetch("/shop/tracker/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body:
+          "orderId=" +
+          encodeURIComponent(orderId) +
+          "&email=" +
+          encodeURIComponent(email) +
+          "&csrfmiddlewaretoken=" +
+          encodeURIComponent(csrf),
+      })
+        .then(function (r) {
+          return r.json();
         })
-        .done(function(data) {
-            $('#citems').empty();
-            console.log(data)
-            data = JSON.parse(data);
-            if (data['status'] == 'success') {
-                updates = data['updates'];
-                for (i = 0; i < updates.length; i++) {
-                    let text = updates[i]['text'];
-                    let time = updates[i]['time'];
-                    mystr = `<li class="list-group-item d-flex justify-content-between align-items-center">
-                    ${text}
-                    <span class="badge badge-primary badge-pill">${time}</span>
-                </li>`
-                    $('#items').append(mystr);
-                }
-            // Fill in the order details
-            cart = JSON.parse(data['itemsJson']);
-            console.log(cart);
-            for (item in cart) {
-                let name = cart[item][1];
-                let qty = cart[item][0];
-                mystr = `<li class="list-group-item d-flex justify-content-between align-items-center">
-                    ${name}
-                    <span class="badge badge-primary badge-pill">${qty}</span>
-                </li>`
-                $('#citems').append(mystr);
-            }
-            } else {
-                mystr = `<li class="list-group-item d-flex justify-content-between align-items-center">
-                    Sorry, We are not able to fetch this order id and email. Make sure to type correct order Id and email</li>`
-                $('#items').append(mystr);
-                $('#citems').append(mystr);
-            }
+        .then(function (data) {
+          if (data.status === "success") {
+            var statusHtml =
+              data.updates
+                .map(function (u) {
+                  return (
+                    '<div class="tracker-update">' +
+                    '<span class="tracker-update-text">' +
+                    u.text +
+                    "</span>" +
+                    '<span class="tracker-update-time">' +
+                    u.time +
+                    "</span>" +
+                    "</div>"
+                  );
+                })
+                .join("") ||
+              '<p style="color:var(--text-muted)">No updates yet.</p>';
 
+            document.getElementById("status-list").innerHTML = statusHtml;
+
+            var items = JSON.parse(data.itemsJson);
+            var itemsHtml = Object.values(items)
+              .map(function (i) {
+                return (
+                  '<div class="tracker-update">' +
+                  '<span class="tracker-update-text">' +
+                  i[1] +
+                  "</span>" +
+                  '<span class="badge badge-primary">Qty: ' +
+                  i[0] +
+                  "</span>" +
+                  "</div>"
+                );
+              })
+              .join("");
+
+            document.getElementById("items-list").innerHTML = itemsHtml;
+            document.getElementById("tracker-results").style.display = "block";
+          } else {
+            document.getElementById("tracker-empty").style.display = "block";
+          }
+        })
+        .catch(function () {
+          showToast("Something went wrong. Please try again.");
         });
-    event.preventDefault();
-});
-
+    });
+</script>
 {% endblock %}

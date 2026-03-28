@@ -1,183 +1,47 @@
-{% extends 'shop/basic.html' %}
-
-<!-- Block for the page title -->
-{% block title %} About AuraBazaar {% endblock %}
-
-<!-- Block for custom CSS -->
-{% block css %}
-<style>
-  /* Custom styles for the About Us page */
-
-  /* Header section styling */
-  .about-header {
-    background-color: #f8f9fa;
-    padding: 60px 0;
-    text-align: center;
-  }
-  .about-header h1 {
-    font-size: 3rem;
-    font-weight: bold;
-    color: #333;
-  }
-  .about-header p {
-    font-size: 1.2rem;
-    color: #666;
-  }
-
-  /* About section styling */
-  .about-section {
-    padding: 40px 0;
-  }
-  .about-section h2 {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 20px;
-  }
-  .about-section p {
-    font-size: 1.1rem;
-    color: #555;
-    line-height: 1.8;
-  }
-
-  /* Team section styling */
-  .team-section {
-    background-color: #f8f9fa;
-    padding: 40px 0;
-  }
-  .team-member {
-    text-align: center;
-    margin-bottom: 30px;
-  }
-  .team-member img {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    margin-bottom: 15px;
-  }
-  .team-member h4 {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #333;
-  }
-  .team-member p {
-    font-size: 1rem;
-    color: #666;
-  }
-
-  /* Call-to-Action section styling */
-  .cta-section {
-    background-color: #007bff;
-    color: #fff;
-    padding: 60px 0;
-    text-align: center;
-  }
-  .cta-section h2 {
-    font-size: 2.5rem;
-    font-weight: bold;
-    margin-bottom: 20px;
-  }
-  .cta-section p {
-    font-size: 1.2rem;
-    margin-bottom: 30px;
-  }
-  .cta-section .btn {
-    font-size: 1.1rem;
-    padding: 10px 30px;
-  }
-</style>
-{% endblock %}
-
-<!-- Block for the main body content -->
-{% block body %}
-{% load static %}
-
-<!-- Header Section -->
-<div class="about-header">
+{% extends 'shop/base.html' %} {% block title %}About — AuraBazaar{% endblock %}
+{% block content %}
+<div class="page-hero">
   <div class="container">
     <h1>About AuraBazaar</h1>
-    <p>Welcome to AuraBazaar - Your one-stop destination for all your shopping needs!</p>
+    <p>Your one-stop destination for quality products at honest prices.</p>
   </div>
 </div>
 
-<!-- Mission Section -->
-<div class="about-section">
-  <div class="container">
-    <h2>Our Mission</h2>
-    <p>
-      At AuraBazaar, we are committed to providing high-quality products at affordable prices. Our mission is to make
-      shopping convenient, enjoyable, and accessible for everyone. Whether you're looking for the latest trends or
-      everyday essentials, we've got you covered.
-    </p>
-  </div>
+<div
+  class="container"
+  style="padding-top: 3rem; padding-bottom: 1rem; max-width: 760px"
+>
+  <h2 style="font-weight: 800; margin-bottom: 1rem">Our Mission</h2>
+  <p style="color: var(--text-muted); line-height: 1.9; font-size: 1.05rem">
+    At AuraBazaar, we are committed to providing high-quality products at
+    affordable prices. Our mission is to make shopping convenient, enjoyable,
+    and accessible for everyone — whether you're looking for the latest trends
+    or everyday essentials.
+  </p>
 </div>
 
-<!-- Team Section -->
-<div class="team-section">
-  <div class="container">
-    <h2>Meet Our Team</h2>
-    <div class="row">
-      <!-- Team Member 1 -->
-      <div class="col-md-4 team-member">
-        <img src="/static/shop/profile.png" alt="Team Member 1">
-        <h4>Atharva Puranik</h4>
-        <p>Founder & CEO</p>
-      </div>
-      <!-- Team Member 2 -->
-      <div class="col-md-4 team-member">
-        <img src="/static/shop/profile.png" alt="Team Member 2">
-        <h4>Atharva Puranik</h4>
-        <p>Head of Operations</p>
-      </div>
-      <!-- Team Member 3 -->
-      <div class="col-md-4 team-member">
-        <img src="/static/shop/profile.png" alt="Team Member 3">
-        <h4>Atharva Puranik</h4>
-        <p>Lead Developer</p>
-      </div>
+<div
+  class="container"
+  style="padding-top: 2.5rem; padding-bottom: 1rem; max-width: 760px"
+>
+  <h2 style="font-weight: 800; margin-bottom: 0.5rem">Meet the Team</h2>
+  <div class="team-grid">
+    <div class="team-card">
+      <div class="team-avatar">A</div>
+      <div class="team-name">Atharva Puranik</div>
+      <div class="team-role">Founder &amp; Developer</div>
     </div>
   </div>
 </div>
 
-<!-- Call-to-Action Section -->
-<div class="cta-section">
-  <div class="container">
-    <h2>Join Our Community</h2>
-    <p>Sign up today and start exploring our wide range of products. Happy shopping!</p>
-    <a href="/shop" class="btn btn-light">Shop Now</a>
+<div
+  class="container"
+  style="padding-top: 2rem; padding-bottom: 3rem; max-width: 760px"
+>
+  <div class="cta-block">
+    <h3>Ready to shop?</h3>
+    <p>Browse our full range of products and find something you'll love.</p>
+    <a href="/shop" class="btn btn-white btn-lg">Browse Products</a>
   </div>
 </div>
-{% endblock %}
-
-<!-- Block for JavaScript -->
-{% block js %}
-<script>
-  // Initialize cart if it doesn't exist in localStorage
-  if (localStorage.getItem('cart') == null) {
-    var cart = {};
-  } else {
-    // Retrieve cart from localStorage
-    cart = JSON.parse(localStorage.getItem('cart'));
-    // Update cart count in the UI
-    document.getElementById('cart').innerHTML = Object.keys(cart).length;
-  }
-
-  // Add item to cart on button click
-  $('.cart').click(function () {
-    var idstr = this.id.toString();
-    if (cart[idstr] != undefined) {
-      cart[idstr] = cart[idstr] + 1; // Increment quantity if item already exists
-    } else {
-      cart[idstr] = 1; // Add new item to cart
-    }
-    // Save updated cart to localStorage
-    localStorage.setItem('cart', JSON.stringify(cart));
-    // Update cart count in the UI
-    document.getElementById('cart').innerHTML = Object.keys(cart).length;
-  });
-
-  // Initialize popover for cart
-  $('#popcart').popover();
-  document.getElementById("popcart").setAttribute('data-content', '<h5> Items in my cart</h5>');
-</script>
 {% endblock %}

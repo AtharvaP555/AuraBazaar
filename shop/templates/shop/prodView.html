@@ -1,111 +1,66 @@
-{% extends 'shop/basic.html' %}
+{% extends 'shop/base.html' %} {% block title %}{{ product.product_name }} —
+AuraBazaar{% endblock %} {% block content %}
+<div class="container" style="padding-top: 2rem; padding-bottom: 3rem">
+  <nav class="breadcrumb">
+    <a href="/shop">Home</a>
+    <span class="breadcrumb-sep">›</span>
+    <a href="/shop">{{ product.category }}</a>
+    <span class="breadcrumb-sep">›</span>
+    <span>{{ product.product_name }}</span>
+  </nav>
 
-{% block title %} {{ product.product_name }} - Product View {% endblock %}
-
-{% block css %}
-<style>
-  /* Scoped styles for the product page only */
-  .product-container {
-    margin-top: 20px;
-    padding: 20px;
-    background-color: #f8f9fa;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  .product-image {
-    max-width: 100%;
-    height: auto;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  .product-details {
-    padding-left: 30px;
-  }
-  .product-title {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 20px;
-  }
-  .product-price {
-    font-size: 1.5rem;
-    color: #28a745;
-    margin-bottom: 20px;
-  }
-  .product-description {
-    font-size: 1.1rem;
-    line-height: 1.6;
-    margin-bottom: 30px;
-  }
-  .btn-custom {
-    padding: 10px 20px;
-    font-size: 1rem;
-    margin-right: 10px;
-  }
-  .btn-buy-now {
-    background-color: #007bff;
-    border: none;
-  }
-  .btn-buy-now:hover {
-    background-color: #0056b3;
-  }
-  .btn-add-to-cart {
-    background-color: #28a745;
-    border: none;
-  }
-  .btn-add-to-cart:hover {
-    background-color: #218838;
-  }
-</style>
-{% endblock %}
-
-{% block body %}
-<div class="container product-container my-5">
-  <div class="row">
-    <!-- Product Image -->
-    <div class="col-md-6">
-      <img src="/media/{{ product.image }}" class="product-image" alt="{{ product.product_name }}">
+  <div
+    style="
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: start;
+    "
+  >
+    <div>
+      <img
+        src="/media/{{ product.image }}"
+        alt="{{ product.product_name }}"
+        class="product-detail-img"
+      />
     </div>
 
-    <!-- Product Details -->
-    <div class="col-md-6 product-details">
-      <h1 class="product-title">{{ product.product_name }}</h1>
-      <p class="product-price"><b>Rs. {{ product.price }}</b></p>
-      <p class="product-description">{{ product.description }}</p>
+    <div>
+      <span class="badge badge-primary" style="margin-bottom: 1rem"
+        >{{ product.category }}</span
+      >
+      <h1 style="font-size: 1.75rem; font-weight: 800; margin-bottom: 0.25rem">
+        {{ product.product_name }}
+      </h1>
+      <div class="product-detail-price">Rs. {{ product.price }}</div>
+      <p
+        style="color: var(--text-muted); line-height: 1.8; margin-bottom: 2rem"
+      >
+        {{ product.description }}
+      </p>
 
-      <!-- Buttons -->
-      <div class="mt-4">
-        <button class="btn btn-custom btn-buy-now">Buy Now</button>
-        <button class="btn btn-custom btn-add-to-cart">Add to Cart</button>
+      <div style="display: flex; gap: 1rem">
+        <button
+          class="btn btn-primary btn-lg"
+          onclick="Cart.add('{{ product.id }}', '{{ product.product_name }}', {{ product.price }}); openCart()"
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+          >
+            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <path d="M16 10a4 4 0 01-8 0" />
+          </svg>
+          Add to Cart
+        </button>
+        <a href="/shop" class="btn btn-outline btn-lg">← Back</a>
       </div>
     </div>
   </div>
 </div>
-{% endblock %}
-
-{% block js %}
-
- if(localStorage.getItem('cart') == null){
-var cart = {};
-}
-else
-{
-cart = JSON.parse(localStorage.getItem('cart'));
-document.getElementById('cart').innerHTML = Object.keys(cart).length;
-}
-$('.cart').click(function(){
-var idstr = this.id.toString();
-if (cart[idstr] !=undefined){
-cart[idstr] = cart[idstr] + 1;
-}
-else
-{
-cart[idstr] = 1;
-}
-localStorage.setItem('cart', JSON.stringify(cart));
-document.getElementById('cart').innerHTML = Object.keys(cart).length;
-});
-$('#popcart').popover();
-document.getElementById("popcart").setAttribute('data-content', '<h5> Items in my cart</h5>');
-
-
 {% endblock %}
