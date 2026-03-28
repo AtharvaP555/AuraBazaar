@@ -157,7 +157,7 @@
 </div>
 {% endblock %} {% block extra_js %}
 <script>
-  (function() {
+  document.addEventListener('DOMContentLoaded', function() {
     var data = Cart.getData();
     var keys = Object.keys(data);
     var html = '';
@@ -179,7 +179,7 @@
     }
 
     document.getElementById('itemsJson').value = JSON.stringify(data);
-  })();
+  });
 
   {% if thank %}
   localStorage.removeItem('ab_cart');
