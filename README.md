@@ -1,89 +1,62 @@
 # AuraBazaar
 
-AuraBazaar is an e-commerce platform built using Django, designed to offer a seamless shopping experience. The project includes essential e-commerce features like product browsing, searching, checkout, order tracking, and contact forms.
-
-## Features
-- Home page displaying product categories
-- Product details page with "Add to Cart" and "Buy Now" options
-- Search functionality to find products
-- Contact page for customer inquiries
-- Order tracking system
-- Checkout system with form validation
-- Shopping cart with local storage functionality
-- Django-based backend with a MySQL database
+A Django-based e-commerce web application.
 
 ## Tech Stack
-- **Frontend**: HTML, CSS, Bootstrap, JavaScript, jQuery
-- **Backend**: Django (Python), MySQL
-- **Database**: MySQL
-- **Deployment**: Django development server (can be hosted on platforms like AWS, Heroku, or PythonAnywhere)
 
-## Installation & Setup
-1. **Clone the Repository**
-   ```bash
-   git clone https://github.com/AtharvaP555/AuraBazaar.git
-   cd AuraBazaar
-   ```
+- Python 3.10+
+- Django 5.1
+- Bootstrap 5
+- SQLite (dev) / configurable for production
+- WhiteNoise for static file serving
 
-2. **Set Up a Virtual Environment**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows, use venv\Scripts\activate
-   ```
+## Local Setup
 
-3. **Install Dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
+### 1. Clone the repo
 
-4. **Set Up the Database**
-   ```bash
-   python manage.py makemigrations
-   python manage.py migrate
-   ```
+git clone https://github.com/AtharvaP555/AuraBazaar.git
+cd AuraBazaar/ecp
 
-5. **Create a Superuser for Admin Panel**
-   ```bash
-   python manage.py createsuperuser
-   ```
+### 2. Create and activate a virtual environment
 
-6. **Run the Development Server**
-   ```bash
-   python manage.py runserver
-   ```
+python -m venv venv
+venv\Scripts\activate # Windows
+source venv/bin/activate # Mac/Linux
 
-7. **Access the Application**
-   - Open your browser and visit: `http://127.0.0.1:8000/`
-   - Admin panel: `http://127.0.0.1:8000/admin/`
+### 3. Install dependencies
 
-## Project Structure
-```
-AuraBazaar/
-│── ecp/                 # Main Django project folder
-│── shop/                # Django app handling e-commerce functionality
-│   ├── migrations/      # Database migrations
-│   ├── static/          # Static files (CSS, JS, images)
-│   ├── templates/       # HTML templates
-│   ├── models.py        # Database models
-│   ├── views.py         # Backend logic
-│   ├── urls.py          # URL routing
-│── media/               # User-uploaded images (if applicable)
-│── db.sqlite3           # Default Django database (change to MySQL in production)
-│── manage.py            # Django project management script
-│── requirements.txt     # Python dependencies
-│── README.md            # Project documentation
-```
+pip install -r requirements.txt
 
-## Contributing
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature-branch`).
-3. Commit your changes (`git commit -m 'Add new feature'`).
-4. Push to the branch (`git push origin feature-branch`).
-5. Open a Pull Request.
+### 4. Set up environment variables
 
-## License
-This project is licensed under the MIT License.
+Copy .env.example to .env and fill in your values:
+cp .env.example .env
 
-## Author
-Developed by **AtharvaP555**
+### 5. Run migrations
 
+python manage.py migrate
+
+### 6. Create a superuser
+
+python manage.py createsuperuser
+
+### 7. Run the development server
+
+python manage.py runserver
+
+## Environment Variables
+
+| Variable      | Description                   |
+| ------------- | ----------------------------- |
+| SECRET_KEY    | Django secret key             |
+| ALLOWED_HOSTS | Comma-separated allowed hosts |
+
+## Git Workflow
+
+This project uses conventional commits:
+
+- `fix:` bug fixes
+- `security:` security improvements
+- `feat:` new features
+- `perf:` performance improvements
+- `chore:` maintenance tasks
